@@ -1,0 +1,11 @@
+- http explication simple :
+https://www.ionos.fr/digitalguide/hebergement/aspects-techniques/definition-protocole-http/
+
+- Une session HTTP typique explication
+https://developer.mozilla.org/fr/docs/Web/HTTP/Session
+
+- http 2.0 RFC (requests for comments == demande de commentaires) :
+https://tools.ietf.org/html/rfc7540
+
+- utilisations techno pourcentage :
+https://w3techs.com/technologies/history_overview/site_element/all
