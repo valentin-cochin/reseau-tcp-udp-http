@@ -7,40 +7,29 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ServeurApp {
-	
+
 	public static void main(String[] args) throws IOException {
-		ServerSocket ss = new ServerSocket(8080);
-		
-		System.out.println("serveur : en attente de connexion ...");
-		Socket sc = ss.accept();
-		
-		System.out.println("serveur : connexion établie !");
-		OutputStream os = sc.getOutputStream();
-		
-		os.write("serveur : entrer un caractere > \n".getBytes());
-		
-		InputStream is = sc.getInputStream();
-		int caractereRecu = is.read();
-		System.out.println("caractere recu : "+(char)caractereRecu);
-		
-		os.write(("\nserveur : le caractere qui suit est > "+(char)(caractereRecu+1)+"\n").getBytes());
-		os.flush();
-		
-		sc = ss.accept();
-		
-		System.out.println("serveur : connexion établie !");
-		os = sc.getOutputStream();
-		
-		os.write("serveur : entrer un caractere > \n".getBytes());
-		
-		is = sc.getInputStream();
-		caractereRecu = is.read();
-		System.out.println("caractere recu : "+(char)caractereRecu);
-		
-		os.write(("\nserveur : le caractere qui suit est > "+(char)(caractereRecu+1)+"\n").getBytes());
-		os.flush();
-		
-		ss.close();
+		try (ServerSocket ss = new ServerSocket(8080)) {
+
+			while (true) {
+				System.out.println("serveur : en attente de connexion ...");
+				Socket sc = ss.accept();
+
+				System.out.println("serveur : connexion établie !");
+				OutputStream os = sc.getOutputStream();
+
+				os.write("serveur : entrer un caractere > \n".getBytes());
+
+				InputStream is = sc.getInputStream();
+				int caractereRecu = is.read();
+				System.out.println("caractere recu : " + (char) caractereRecu);
+
+				os.write(("\nserveur : le caractere qui suit est > " + (char) (caractereRecu + 1) + "\n").getBytes());
+				os.flush();
+			}
+			
+		}
+
 	}
 
 }
