@@ -26,6 +26,7 @@ public class ServeurApp {
 
 				os.write(("\nserveur : le caractere qui suit est > " + (char) (caractereRecu + 1) + "\n").getBytes());
 				os.flush();
+				sc.close();
 			}
 			
 		}
