@@ -26,6 +26,20 @@ public class ServeurApp {
 		os.write(("\nserveur : le caractere qui suit est > "+(char)(caractereRecu+1)+"\n").getBytes());
 		os.flush();
 		
+		sc = ss.accept();
+		
+		System.out.println("serveur : connexion établie !");
+		os = sc.getOutputStream();
+		
+		os.write("serveur : entrer un caractere > \n".getBytes());
+		
+		is = sc.getInputStream();
+		caractereRecu = is.read();
+		System.out.println("caractere recu : "+(char)caractereRecu);
+		
+		os.write(("\nserveur : le caractere qui suit est > "+(char)(caractereRecu+1)+"\n").getBytes());
+		os.flush();
+		
 		ss.close();
 	}
 
