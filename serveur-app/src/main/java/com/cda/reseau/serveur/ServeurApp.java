@@ -17,12 +17,14 @@ public class ServeurApp {
 		System.out.println("serveur : connexion établie !");
 		OutputStream os = sc.getOutputStream();
 		
-		os.write(99);
+		os.write("serveur : entrer un caractere > \n".getBytes());
 		
 		InputStream is = sc.getInputStream();
-		int y = is.read();
+		int caractereRecu = is.read();
+		System.out.println("caractere recu : "+(char)caractereRecu);
 		
-		System.out.println("serveur : y : "+(char)y);
+		os.write(("\nserveur : le caractere qui suit est > "+(char)(caractereRecu+1)+"\n").getBytes());
+		os.flush();
 		
 		ss.close();
 	}
