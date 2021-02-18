@@ -1,4 +1,4 @@
-package com.cda.reseau.serveur;
+package com.cda.reseau.serveur.tcp;
 
 import java.io.IOException;
 import java.io.InputStream;

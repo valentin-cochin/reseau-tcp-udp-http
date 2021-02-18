@@ -1,4 +1,4 @@
-package com.cda.reseau.client;
+package com.cda.reseau.client.tcp;
 
 import java.io.BufferedReader;
 import java.io.IOException;
