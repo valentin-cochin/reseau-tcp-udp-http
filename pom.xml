@@ -11,6 +11,7 @@
 	<modules>
 		<module>client-app</module>
 		<module>serveur-app</module>
+		<module>sujets-suivi-app</module>
 	</modules>
 
 	<build>
