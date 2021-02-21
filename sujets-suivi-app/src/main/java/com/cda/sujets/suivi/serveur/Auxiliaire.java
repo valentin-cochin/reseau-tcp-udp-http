@@ -1,12 +1,17 @@
 package com.cda.sujets.suivi.serveur;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.LocalDateTime;
 
 public class Auxiliaire implements Runnable {
 	private final Socket socketClient;
@@ -17,112 +22,84 @@ public class Auxiliaire implements Runnable {
 
 	@Override
 	public void run() {
+		OutputStream os = null;
+		InputStream is = null;
+		BufferedReader br = null;
 		try {
-			OutputStream os = socketClient.getOutputStream();
-			InputStream is = socketClient.getInputStream();
+			is = socketClient.getInputStream();
+			os = socketClient.getOutputStream();
+			br = new BufferedReader(new InputStreamReader(is));
 
-			BufferedReader br = new BufferedReader(new InputStreamReader(is));
-			PrintWriter prw = new PrintWriter(os, true);
+			String requeteLigne = br.readLine();
+			if(requeteLigne == null || requeteLigne.isEmpty()) {
+				this.repondre(
+						os,
+						HttpStatus.REQUETE_INCORRECTE,
+						new ByteArrayInputStream(HttpStatus.REQUETE_INCORRECTE.getDescription().getBytes())
+						);
+			} else {
+				System.out.println("premiere ligne : "+requeteLigne);
 
-			String s;
-			while ((s = br.readLine()) != null) {
-				System.out.println(s);
-				if (s.isEmpty()) {
-					break;
+				String fichierCible = requeteLigne.split(" ")[1];
+				
+				fichierCible = "/".equals(fichierCible)?"/index.html":File.separator+fichierCible;
+				System.out.println("> fichierCible : "+fichierCible);
+				Path fichierCiblePath = Paths.get(ServeurApp.SITE_PATH.toString()+fichierCible);
+
+				while ((requeteLigne = br.readLine()) != null) {
+					System.out.println(requeteLigne);
+					if (requeteLigne.isEmpty()) {
+						break;
+					}
 				}
+
+				this.repondre(os,
+						HttpStatus.TOUT_VA_BIEN,
+						Files.newInputStream(fichierCiblePath));
 			}
 
-			System.out.println("debut ecriture reponse");
-			prw.println("HTTP/1.1 200 OK");
-			prw.println("Date: Fri, 31 Dec 2021 23:59:59 GMT");
-			prw.println("Server: CDA SERVER");
-			prw.println("Content-Type: text/html");
-			prw.println("");
-			prw.println("<!DOCTYPE html>\r\n"
-					+ "<html lang=\"en\">\r\n"
-					+ "\r\n"
-					+ "<head>\r\n"
-					+ "    <meta charset=\"UTF-8\">\r\n"
-					+ "    <title>CDA tcp/udp/http</title>\r\n"
-					+ "    <style>\r\n"
-					+ "        p {\r\n"
-					+ "            background-color: red;\r\n"
-					+ "            font-size: larger;\r\n"
-					+ "        }\r\n"
-					+ "        table {\r\n"
-					+ "            width: 100%;\r\n"
-					+ "            border: solid 3px dimgray;\r\n"
-					+ "        }\r\n"
-					+ "        tr:nth-child(odd) {\r\n"
-					+ "            background-color: cornsilk;\r\n"
-					+ "        }\r\n"
-					+ "		   thead tr:first-child {\r\n"
-					+ "            background-color: darkgrey;\r\n"
-					+ "        }"
-					+ "    </style>\r\n"
-					+ "</head>\r\n"
-					+ "\r\n"
-					+ "<body>\r\n"
-					+ "    <table>\r\n"
-					+ "        <thead>\r\n"
-					+ "            <tr>\r\n"
-					+ "                <th>id</th>\r\n"
-					+ "                <th>titre</th>\r\n"
-					+ "                <th>etat</th>\r\n"
-					+ "                <th>date</th>\r\n"
-					+ "            </tr>\r\n"
-					+ "        </thead>\r\n"
-					+ "        <tbody>\r\n"
-					+ "            <tr>\r\n"
-					+ "                <td>&nbsp;</td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "            </tr>\r\n"
-					+ "            <tr>\r\n"
-					+ "                <td>&nbsp;</td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "            </tr>\r\n"
-					+ "            <tr>\r\n"
-					+ "                <td>&nbsp;</td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "            </tr>\r\n"
-					+ "            <tr>\r\n"
-					+ "                <td>&nbsp;</td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "            </tr>\r\n"
-					+ "            <tr>\r\n"
-					+ "                <td>&nbsp;</td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "                <td></td>\r\n"
-					+ "            </tr>\r\n"
-					+ "        </tbody>\r\n"
-					+ "    </table>\r\n"
-					+ "</body>\r\n"
-					+ "\r\n"
-					+ "</html>");
 
-			prw.close();
-			br.close();
-
-			socketClient.close();
 		} catch(Exception e) {
 			e.printStackTrace();
+			if(os != null) {
+				try {
+					this.repondre(os, 
+							HttpStatus.PROBLEME_TECHNIQUE, 
+							new ByteArrayInputStream("ERROR".getBytes()));
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
 		} finally {
-			try {
-				this.socketClient.close();
-			} catch (IOException e) {
-				e.printStackTrace();
+			if(os != null) {
+				try {
+					os.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+			if(is != null) {
+				try {
+					is.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
+	}
+
+	private void repondre(OutputStream os, HttpStatus reponseStatus, InputStream reponseInput) throws IOException {
+		os.write(("HTTP/1.1 "+reponseStatus.getCode()+" "+reponseStatus.getDescription()+"\n").getBytes());
+		os.write(("Date: "+LocalDateTime.now()+"\n").getBytes());
+		os.write(("Server: CDA SERVER"+"\n").getBytes());
+		os.write(("Content-Type: text/html"+"\n").getBytes());
+		os.write(("\n").getBytes());
+		byte[] buffer = new byte[100];
+		int nbOctetsLus;
+		while((nbOctetsLus = reponseInput.read(buffer)) != -1) {
+			os.write(buffer, 0, nbOctetsLus);
+		}
 	}
 
 }
