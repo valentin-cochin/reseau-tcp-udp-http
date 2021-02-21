@@ -45,9 +45,15 @@ public class Auxiliaire implements Runnable {
 				Path fichierCiblePath = Paths.get(ServeurApp.SITE_PATH.toString()+fichierCible);
 
 				if(Files.exists(fichierCiblePath) && Files.isRegularFile(fichierCiblePath)) {
+					ContentType ct = ContentType.TEXT_HTML;
+					if(fichierCiblePath.toString().toUpperCase().endsWith(".CSS")) {
+						ct = ContentType.TEXT_CSS;
+					} 
+					
 					this.repondre(os,
 							HttpStatus.TOUT_VA_BIEN,
-							Files.newInputStream(fichierCiblePath));
+							Files.newInputStream(fichierCiblePath),
+							ct);
 				} else {
 					this.repondre(os,
 							HttpStatus.FICHIER_INTROUVABLE);
@@ -89,14 +95,15 @@ public class Auxiliaire implements Runnable {
 		this.repondre(
 				os, 
 				reponseStatus, 
-				new ByteArrayInputStream(reponseStatus.getDescription().getBytes()));
+				new ByteArrayInputStream(reponseStatus.getDescription().getBytes()),
+				ContentType.TEXT_HTML);
 	}
 	
-	private void repondre(OutputStream os, HttpStatus reponseStatus, InputStream reponseInput) throws IOException {
+	private void repondre(OutputStream os, HttpStatus reponseStatus, InputStream reponseInput, ContentType contentType) throws IOException {
 		os.write(("HTTP/1.1 "+reponseStatus.getCode()+" "+reponseStatus.getDescription()+"\n").getBytes());
 		os.write(("Date: "+LocalDateTime.now()+"\n").getBytes());
 		os.write(("Server: CDA SERVER"+"\n").getBytes());
-		os.write(("Content-Type: text/html"+"\n").getBytes());
+		os.write(("Content-Type: "+contentType.getValue()+"\n").getBytes());
 		os.write(("\n").getBytes());
 		byte[] buffer = new byte[100];
 		int nbOctetsLus;
