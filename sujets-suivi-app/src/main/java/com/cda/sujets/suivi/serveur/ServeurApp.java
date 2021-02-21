@@ -9,12 +9,22 @@ import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.velocity.app.VelocityEngine;
+import org.apache.velocity.runtime.RuntimeConstants;
+import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader;
+
 public class ServeurApp {
 
 	private static final String SITE_ROOT = "mon-site";
 	public static Path SITE_PATH;
+	public static VelocityEngine VELOCITY_ENGINE;
 	
 	public static void main(String[] args) throws IOException {
+		
+		VELOCITY_ENGINE = new VelocityEngine();
+		VELOCITY_ENGINE.setProperty(RuntimeConstants.RESOURCE_LOADER, "classpath");
+		VELOCITY_ENGINE.setProperty("classpath.resource.loader.class", ClasspathResourceLoader.class.getName());
+		VELOCITY_ENGINE.init();
 		
 		String userHomePath = System.getProperty("user.home");
 		

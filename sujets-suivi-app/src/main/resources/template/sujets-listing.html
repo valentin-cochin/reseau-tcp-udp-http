@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>CDA tcp/udp/http</title>
+    <style>
+    </style>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <table>
+    <caption>liste des sujets</caption>
+        <thead>
+            <tr>
+                <th>id</th>
+                <th>titre</th>
+                <th>etat</th>
+                <th>date</th>
+            </tr>
+        </thead>
+        <tbody>
+			#foreach($sujet in $sujets)
+	            <tr>
+	                <td>$sujet.id</td>
+	                <td>$sujet.nom</td>
+	                <td>$sujet.etat</td>
+	                <td>$sujet.dateDecouverte</td>
+	            </tr>
+		    #end
+        </tbody>
+    </table>
+</body>
+
+</html>
