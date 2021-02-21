@@ -13,6 +13,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 
+import com.cda.sujets.suivi.vue.SujetsListe;
+
 public class Auxiliaire implements Runnable {
 	private final Socket socketClient;
 
@@ -44,7 +46,13 @@ public class Auxiliaire implements Runnable {
 				System.out.println("> fichierCible : "+fichierCible);
 				Path fichierCiblePath = Paths.get(ServeurApp.SITE_PATH.toString()+fichierCible);
 
-				if(Files.exists(fichierCiblePath) && Files.isRegularFile(fichierCiblePath)) {
+				if(fichierCible.endsWith("/sujets-listing.html")) {
+					this.repondre(os,
+							HttpStatus.TOUT_VA_BIEN,
+							new SujetsListe().getContenu(),
+							ContentType.TEXT_HTML);
+
+				} else if(Files.exists(fichierCiblePath) && Files.isRegularFile(fichierCiblePath)) {
 					ContentType ct = ContentType.TEXT_HTML;
 					if(fichierCiblePath.toString().toUpperCase().endsWith(".CSS")) {
 						ct = ContentType.TEXT_CSS;
