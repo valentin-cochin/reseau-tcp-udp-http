@@ -3,7 +3,12 @@ package com.cda.sujets.suivi.vue;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 
+import com.cda.sujets.suivi.service.ISujetService;
+import com.cda.sujets.suivi.service.SujetServiceImpl;
+
 public class SujetsListe implements VueDynamique {
+
+	private ISujetService sujetService = new SujetServiceImpl();
 
 	@Override
 	public InputStream getContenu() {
@@ -28,36 +33,16 @@ public class SujetsListe implements VueDynamique {
 		sb.append("            </tr>");
 		sb.append("        </thead>");
 		sb.append("        <tbody>");
-		sb.append("            <tr>");
-		sb.append("                <td>&nbsp;</td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("            </tr>");
-		sb.append("            <tr>");
-		sb.append("                <td>&nbsp;</td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("            </tr>");
-		sb.append("            <tr>");
-		sb.append("                <td>&nbsp;</td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("            </tr>");
-		sb.append("            <tr>");
-		sb.append("                <td>&nbsp;</td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("            </tr>");
-		sb.append("            <tr>");
-		sb.append("                <td>&nbsp;</td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("                <td></td>");
-		sb.append("            </tr>");
+		
+		this.sujetService.chercherTousLesSujets().forEach(s->{
+			sb.append("            <tr>");
+			sb.append("                <td>"+s.getId()+"</td>");
+			sb.append("                <td>"+s.getNom()+"</td>");
+			sb.append("                <td>"+s.getEtat()+"</td>");
+			sb.append("                <td>"+s.getDateDecouverte()+"</td>");
+			sb.append("            </tr>");
+		});
+		
 		sb.append("        </tbody>");
 		sb.append("    </table>");
 		sb.append("</body>");
