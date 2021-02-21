@@ -34,9 +34,7 @@ public class Auxiliaire implements Runnable {
 			if(requeteLigne == null || requeteLigne.isEmpty()) {
 				this.repondre(
 						os,
-						HttpStatus.REQUETE_INCORRECTE,
-						new ByteArrayInputStream(HttpStatus.REQUETE_INCORRECTE.getDescription().getBytes())
-						);
+						HttpStatus.REQUETE_INCORRECTE);
 			} else {
 				System.out.println("premiere ligne : "+requeteLigne);
 
@@ -46,16 +44,15 @@ public class Auxiliaire implements Runnable {
 				System.out.println("> fichierCible : "+fichierCible);
 				Path fichierCiblePath = Paths.get(ServeurApp.SITE_PATH.toString()+fichierCible);
 
-				while ((requeteLigne = br.readLine()) != null) {
-					System.out.println(requeteLigne);
-					if (requeteLigne.isEmpty()) {
-						break;
-					}
+				if(Files.exists(fichierCiblePath) && Files.isRegularFile(fichierCiblePath)) {
+					this.repondre(os,
+							HttpStatus.TOUT_VA_BIEN,
+							Files.newInputStream(fichierCiblePath));
+				} else {
+					this.repondre(os,
+							HttpStatus.FICHIER_INTROUVABLE);
 				}
-
-				this.repondre(os,
-						HttpStatus.TOUT_VA_BIEN,
-						Files.newInputStream(fichierCiblePath));
+				
 			}
 
 
@@ -64,8 +61,7 @@ public class Auxiliaire implements Runnable {
 			if(os != null) {
 				try {
 					this.repondre(os, 
-							HttpStatus.PROBLEME_TECHNIQUE, 
-							new ByteArrayInputStream("ERROR".getBytes()));
+							HttpStatus.PROBLEME_TECHNIQUE);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
@@ -89,6 +85,13 @@ public class Auxiliaire implements Runnable {
 
 	}
 
+	private void repondre(OutputStream os, HttpStatus reponseStatus) throws IOException {
+		this.repondre(
+				os, 
+				reponseStatus, 
+				new ByteArrayInputStream(reponseStatus.getDescription().getBytes()));
+	}
+	
 	private void repondre(OutputStream os, HttpStatus reponseStatus, InputStream reponseInput) throws IOException {
 		os.write(("HTTP/1.1 "+reponseStatus.getCode()+" "+reponseStatus.getDescription()+"\n").getBytes());
 		os.write(("Date: "+LocalDateTime.now()+"\n").getBytes());
